@@ -1,0 +1,8 @@
+{
+  "Usermap": {
+    "BaseUrl": "https://kosapi.fit.cvut.cz/usermap/v1"
+  },
+  "Auth": {
+    "AccessToken": "<fill access token>"
+  }
+}

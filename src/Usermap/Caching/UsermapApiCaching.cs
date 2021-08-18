@@ -19,15 +19,15 @@ namespace Usermap.Caching
                 return false;
             }
             
-            _cache.TryGetValue(identifier, out T? entry);
+            bool found = _cache.TryGetValue(identifier, out T? entry);
             
-            if (cachePolicy == CachePolicy.CacheOnly && entry == null)
+            if (cachePolicy == CachePolicy.CacheOnly && !found)
             {
                 throw new CacheEntryNotFoundException();
             }
 
             outEntry = entry;
-            return true;
+            return found;
         }
 
         public T? SetCache<T>(string identifier, T? data)
