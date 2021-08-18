@@ -9,6 +9,12 @@ namespace Usermap
     public class UsermapApiOptions : IOptionsSnapshot<UsermapApiOptions>
     {
         public MemoryCacheOptions? CacheOptions { get; set; }
+
+        /// <summary>
+        /// Whether to throw on any error (except 404). If false, return null.
+        /// True by default.
+        /// </summary>
+        public bool ThrowOnError { get; set; } = true;
         
         /// <summary>
         /// Url of the API

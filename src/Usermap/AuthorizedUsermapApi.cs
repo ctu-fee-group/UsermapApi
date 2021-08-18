@@ -17,12 +17,17 @@ namespace Usermap
     {
         private readonly RestClient _client;
         private readonly UsermapApiCaching _caching;
-        private UsermapApiPeople? _people;
         private readonly ILogger _logger;
+        private readonly UsermapApiOptions _options;
 
+        // Controllers
+        private UsermapApiPeople? _people;
+
+        
         internal AuthorizedUsermapApi(string accessToken, UsermapApiOptions options, ILogger logger)
         {
             _logger = logger;
+            _options = options;
             _client = new RestClient(options.BaseUrl ?? throw new InvalidOperationException("BaseUrl is null"))
             {
                 CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache),
@@ -37,6 +42,6 @@ namespace Usermap
         /// <summary>
         /// Endpoint /people
         /// </summary>
-        public UsermapApiPeople People => _people ??= new UsermapApiPeople(_client, _caching, _logger);
+        public UsermapApiPeople People => _people ??= new UsermapApiPeople(_client, _options, _caching, _logger);
     }
 }
