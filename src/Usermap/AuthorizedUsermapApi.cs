@@ -1,9 +1,12 @@
 using System;
 using System.Net.Cache;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using RestSharp;
 using RestSharp.Authenticators;
 using RestSharp.Serializers.NewtonsoftJson;
+using Usermap.Caching;
+using Usermap.Controllers;
 
 namespace Usermap
 {
@@ -13,6 +16,7 @@ namespace Usermap
     public class AuthorizedUsermapApi
     {
         private readonly RestClient _client;
+        private readonly UsermapApiCaching _caching;
         private UsermapApiPeople? _people;
         private readonly ILogger _logger;
 
@@ -21,9 +25,11 @@ namespace Usermap
             _logger = logger;
             _client = new RestClient(options.BaseUrl ?? throw new InvalidOperationException("BaseUrl is null"))
             {
-                CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable),
+                CachePolicy = new RequestCachePolicy(RequestCacheLevel.BypassCache),
                 Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(accessToken, "Bearer")
             };
+
+            _caching = new UsermapApiCaching(new MemoryCache(options.CacheOptions ?? new MemoryCacheOptions()));
 
             _client.UseNewtonsoftJson();
         }
@@ -31,6 +37,6 @@ namespace Usermap
         /// <summary>
         /// Endpoint /people
         /// </summary>
-        public UsermapApiPeople People => _people ??= new UsermapApiPeople(_client, _logger);
+        public UsermapApiPeople People => _people ??= new UsermapApiPeople(_client, _caching, _logger);
     }
 }

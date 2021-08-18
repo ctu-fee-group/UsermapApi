@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 namespace Usermap
 {
     /// <summary>
@@ -5,6 +6,8 @@ namespace Usermap
     /// </summary>
     public class UsermapApiOptions
     {
+        public MemoryCacheOptions? CacheOptions { get; set; }
+        
         /// <summary>
         /// Url of the API
         /// </summary>
