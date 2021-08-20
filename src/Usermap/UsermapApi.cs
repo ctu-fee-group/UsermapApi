@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,7 @@ namespace Usermap
     /// <summary>
     /// Entity used to obtain authorized api with specified access token
     /// </summary>
-    public class UsermapApi
+    public class UsermapApi : IDisposable
     {
         private readonly UsermapApiOptions _options;
         private readonly ILogger _logger;
@@ -31,6 +32,15 @@ namespace Usermap
             _authorizedApis.Add(accessToken, api);
 
             return api;
+        }
+
+        public void Dispose()
+        {
+            foreach (AuthorizedUsermapApi api in _authorizedApis.Values)
+            {
+                api.Dispose();
+            }
+            _authorizedApis.Clear();
         }
     }
 }

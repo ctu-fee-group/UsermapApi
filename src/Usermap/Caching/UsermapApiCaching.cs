@@ -1,8 +1,9 @@
+using System;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Usermap.Caching
 {
-    internal class UsermapApiCaching
+    internal class UsermapApiCaching : IDisposable
     {
         private readonly MemoryCache _cache;
         
@@ -33,6 +34,11 @@ namespace Usermap.Caching
         public T? SetCache<T>(string identifier, T? data)
         {
             return _cache.Set(identifier, data);
+        }
+
+        public void Dispose()
+        {
+            _cache.Dispose();
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Usermap
     /// <summary>
     /// Entity used to interact with usermap API
     /// </summary>
-    public class AuthorizedUsermapApi
+    public class AuthorizedUsermapApi : IDisposable
     {
         private readonly RestClient _client;
         private readonly UsermapApiCaching _caching;
@@ -43,5 +43,10 @@ namespace Usermap
         /// Endpoint /people
         /// </summary>
         public UsermapApiPeople People => _people ??= new UsermapApiPeople(_client, _options, _caching, _logger);
+
+        public void Dispose()
+        {
+            _caching.Dispose();
+        }
     }
 }
