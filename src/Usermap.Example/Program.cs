@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Usermap.Controllers;
 using Usermap.Data;
+using Usermap.Extensions;
 
 namespace Usermap.Example
 {
@@ -13,23 +16,14 @@ namespace Usermap.Example
         static async Task Main(string[] args)
         {
             // Note: dependency injection is not needed, but it is easier with it
-            IServiceProvider services = CreateServices();
-            
-            UsermapApi api = services.GetRequiredService<UsermapApi>();
-            string? accessToken = services
-                .GetRequiredService<IOptions<AuthOptions>>()
-                .Value.AccessToken;
+            var services = CreateServices();
+            using var scope = services.CreateScope();
+            var scopedServices = scope.ServiceProvider;
 
-            if (accessToken == null)
-            {
-                throw new InvalidOperationException("AccessToken must be set in config");
-            }
-
-            // Retrieve authorized usermap api that will remember access token
-            AuthorizedUsermapApi authorizedUsermapApi = api.GetAuthorizedApi(accessToken);
+            var peopleApi = scopedServices.GetRequiredService<IUsermapPeopleApi>();
 
             // This could throw if there was error (except 404) and UsermapApiOptions.ThrowOnError was true (that is default)
-            UsermapPerson? person = await authorizedUsermapApi.People.GetPersonAsync("username");
+            UsermapPerson? person = await peopleApi.GetPersonAsync("username");
             if (person != null)
             {
                 Console.WriteLine($"Person {person.FullName} was loaded");
@@ -37,7 +31,7 @@ namespace Usermap.Example
             }
 
             // This is obtained from cache
-            person = await authorizedUsermapApi.People.GetPersonAsync("username");
+            person = await peopleApi.GetPersonAsync("username");
         }
 
         static IServiceProvider CreateServices()
@@ -45,18 +39,20 @@ namespace Usermap.Example
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
                 .Build();
-            
+
             return new ServiceCollection()
                 // Logging is needed in case of errors
                 .AddLogging(builder => builder
                     .AddConsole())
-                
-                // Better to add as scoped, but this example does not support scopes
-                .AddSingleton<UsermapApi>()
-                
+                .AddScoped<IMemoryCache, MemoryCache>()
+                .AddScopedUsermapApi(p =>
+                    p.GetRequiredService<IOptions<AuthOptions>>().Value.AccessToken ??
+                    throw new InvalidOperationException("Access token cannot be null"))
+                .AddScopedUsermapCaching()
+
                 // Add options needed for usermap api
                 .Configure<UsermapApiOptions>(config.GetSection("Usermap"))
-                
+
                 // Add options with access token, used for example, not part of the library
                 .Configure<AuthOptions>(config.GetSection("Auth"))
                 .BuildServiceProvider();
