@@ -3,6 +3,12 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <PackageId>UsermapApi</PackageId>
+        <Title>Usermap Api</Title>
+        <Authors>ctu-fee-group</Authors>
+        <PackageProjectUrl>https://github.com/ctu-fee-group/UsermapApi</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/ctu-fee-group/UsermapApi/blob/master/LICENSE</PackageLicenseUrl>
+        <PackageVersion>0.0.1</PackageVersion>
     </PropertyGroup>
 
     <ItemGroup>
