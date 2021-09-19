@@ -6,6 +6,7 @@
 
 using System;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 
 namespace Usermap.Caching
 {
@@ -15,14 +16,17 @@ namespace Usermap.Caching
     public class UsermapCacheService
     {
         private readonly IMemoryCache _memoryCache;
+        private readonly UsermapCacheOptions _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsermapCacheService"/> class.
         /// </summary>
         /// <param name="memoryCache">The memory cache to use for caching.</param>
-        public UsermapCacheService(IMemoryCache memoryCache)
+        /// <param name="options">The options.</param>
+        public UsermapCacheService(IMemoryCache memoryCache, IOptions<UsermapCacheOptions> options)
         {
             _memoryCache = memoryCache;
+            _options = options.Value;
         }
 
         /// <summary>
@@ -34,7 +38,7 @@ namespace Usermap.Caching
         /// <returns>The cached value.</returns>
         public T? Cache<T>(string key, T? value) =>
             _memoryCache.Set
-                (CreateKey(key), value, DateTimeOffset.Now.AddMinutes(5)); // TODO: move 5 minutes to options dependency
+                (CreateKey(key), value, _options.CreateCacheEntryOptions<T>());
 
         /// <summary>
         /// Tries to find the value with the given identifier in the storage.

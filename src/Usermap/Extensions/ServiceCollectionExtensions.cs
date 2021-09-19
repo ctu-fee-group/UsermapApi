@@ -79,15 +79,19 @@ namespace Usermap.Extensions
         /// </summary>
         /// <param name="services">The collection of the services.</param>
         /// <param name="lifetime">The lifetime for the api.</param>
+        /// <param name="configureOptions">The action for configuring the options of the cache.</param>
         /// <returns>The passed service collection.</returns>
         public static IServiceCollection AddUsermapCaching
         (
             this IServiceCollection services,
-            ServiceLifetime lifetime = ServiceLifetime.Singleton
+            ServiceLifetime lifetime = ServiceLifetime.Singleton,
+            Action<UsermapCacheOptions>? configureOptions = null
         )
         {
             services
                 .TryAddScoped<UsermapCacheService>();
+
+            services.Configure<UsermapCacheOptions>(configureOptions);
 
             return services
                 .Replace
