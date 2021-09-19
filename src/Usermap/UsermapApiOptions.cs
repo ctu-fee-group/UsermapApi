@@ -23,7 +23,7 @@ namespace Usermap
         /// <summary>
         /// Gets or sets the base url of the API.
         /// </summary>
-        public string? BaseUrl { get; set; } = "https://kosapi.fit.cvut.cz/usermap/v1";
+        public string? BaseUrl { get; set; } = "https://kosapi.fit.cvut.cz/usermap/v1/";
 
         /// <inheritdoc />
         public UsermapApiOptions Value => this;
