@@ -1,4 +1,10 @@
-﻿using System;
+﻿//
+//  Program.cs
+//
+//  Copyright (c) Christofel authors. All rights reserved.
+//  Licensed under the MIT license. See LICENSE file in the project root for full license information.
+
+using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -11,44 +17,56 @@ using Usermap.Extensions;
 
 namespace Usermap.Example
 {
-    class Program
+    /// <summary>
+    /// The entry point class for Usermap.Example.
+    /// </summary>
+    public class Program
     {
-        static async Task Main(string[] args)
+        /// <summary>
+        /// The entry point method for Usermap.Example.
+        /// </summary>
+        /// <param name="args">The command line arguments.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public static async Task Main(string[] args)
         {
             // Note: dependency injection is not needed, but it is easier with it
             var services = CreateServices();
-            using var scope = services.CreateScope();
-            var scopedServices = scope.ServiceProvider;
 
-            var peopleApi = scopedServices.GetRequiredService<IUsermapPeopleApi>();
+            var peopleApi = services.GetRequiredService<IUsermapPeopleApi>();
 
             // This could throw if there was error (except 404) and UsermapApiOptions.ThrowOnError was true (that is default)
             UsermapPerson? person = await peopleApi.GetPersonAsync("username");
             if (person != null)
-            {
+            { // You can use person.Roles to list all usermap roles
                 Console.WriteLine($"Person {person.FullName} was loaded");
-                // You can use person.Roles to list all usermap roles
             }
 
             // This is obtained from cache
             person = await peopleApi.GetPersonAsync("username");
         }
 
-        static IServiceProvider CreateServices()
+        private static IServiceProvider CreateServices()
         {
             IConfigurationRoot config = new ConfigurationBuilder()
                 .AddJsonFile("config.json")
                 .Build();
 
             return new ServiceCollection()
+
                 // Logging is needed in case of errors
-                .AddLogging(builder => builder
-                    .AddConsole())
+                .AddLogging
+                (
+                    builder => builder
+                        .AddConsole()
+                )
                 .AddScoped<IMemoryCache, MemoryCache>()
-                .AddScopedUsermapApi(p =>
-                    p.GetRequiredService<IOptions<AuthOptions>>().Value.AccessToken ??
-                    throw new InvalidOperationException("Access token cannot be null"))
-                .AddScopedUsermapCaching()
+                .AddUsermapApi
+                (
+                    p =>
+                        p.GetRequiredService<IOptions<AuthOptions>>().Value.AccessToken ??
+                        throw new InvalidOperationException("Access token cannot be null")
+                )
+                .AddUsermapCaching()
 
                 // Add options needed for usermap api
                 .Configure<UsermapApiOptions>(config.GetSection("Usermap"))
