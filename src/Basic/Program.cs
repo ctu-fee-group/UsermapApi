@@ -6,24 +6,24 @@
 
 using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Usermap;
 using Usermap.Controllers;
 using Usermap.Data;
 using Usermap.Extensions;
 
-namespace Usermap.Example
+namespace Basic
 {
     /// <summary>
-    /// The entry point class for Usermap.Example.
+    /// The entry point class for Basic.
     /// </summary>
     public class Program
     {
         /// <summary>
-        /// The entry point method for Usermap.Example.
+        /// The entry point method for Basic.
         /// </summary>
         /// <param name="args">The command line arguments.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
@@ -59,7 +59,7 @@ namespace Usermap.Example
                     builder => builder
                         .AddConsole()
                 )
-                .AddScoped<IMemoryCache, MemoryCache>()
+                .AddMemoryCache()
                 .AddUsermapApi
                 (
                     p =>
