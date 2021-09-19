@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Usermap\Usermap.csproj" />
+      <ProjectReference Include="..\Usermap\Usermap.csproj" />
     </ItemGroup>
 
 </Project>
