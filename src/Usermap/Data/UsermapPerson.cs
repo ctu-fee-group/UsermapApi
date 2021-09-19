@@ -26,7 +26,7 @@ namespace Usermap.Data
     public record UsermapPerson
     (
         [property: JsonPropertyName("username")] string Username,
-        [property: JsonPropertyName("personalNumber")] string PersonalNumber,
+        [property: JsonPropertyName("personalNumber")] ulong PersonalNumber,
         [property: JsonPropertyName("firstName")] string FirstName,
         [property: JsonPropertyName("lastName")] string LastName,
         [property: JsonPropertyName("fullName")] string FullName,
