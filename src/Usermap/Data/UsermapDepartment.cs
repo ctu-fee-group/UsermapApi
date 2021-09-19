@@ -4,7 +4,7 @@
 //  Copyright (c) Christofel authors. All rights reserved.
 //  Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Usermap.Data
 {
@@ -15,8 +15,8 @@ namespace Usermap.Data
     /// <param name="NameCzech">The name of the department in czech language.</param>
     /// <param name="NameEnglish">The name of the department in english.</param>
     public record UsermapDepartment(
-        [JsonProperty("code")] int Code,
-        [JsonProperty("nameCs")] string NameCzech,
-        [JsonProperty("nameEn")] string NameEnglish
+        [property: JsonPropertyName("code")] int Code,
+        [property: JsonPropertyName("nameCs")] string NameCzech,
+        [property: JsonPropertyName("nameEn")] string NameEnglish
     );
 }

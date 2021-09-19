@@ -33,7 +33,7 @@ namespace Usermap.Controllers
         /// <inheritdoc />
         public virtual async Task<UsermapPerson?> GetPersonAsync(string username, CancellationToken token = default)
         {
-            var result = await _client.GetAsync<UsermapPerson?>($"people/{username}", token);
+            var result = await _client.GetAsync<UsermapPerson?>($"people/{username}", token: token);
 
             if (result is null)
             {

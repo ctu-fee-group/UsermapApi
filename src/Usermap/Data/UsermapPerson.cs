@@ -5,7 +5,7 @@
 //  Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Usermap.Data
 {
@@ -25,16 +25,16 @@ namespace Usermap.Data
     /// <param name="Roles">Business and technical roles of the user.</param>
     public record UsermapPerson
     (
-        [JsonProperty("username")] string Username,
-        [JsonProperty("personalNumber")] string PersonalNumber,
-        [JsonProperty("firstName")] string FirstName,
-        [JsonProperty("lastName")] string LastName,
-        [JsonProperty("fullName")] string FullName,
-        [JsonProperty("emails")] IReadOnlyList<string> Emails,
-        [JsonProperty("preferredEmail")] string PreferredEmail,
-        [JsonProperty("departments")] IReadOnlyList<UsermapDepartment> Departments,
-        [JsonProperty("rooms")] IReadOnlyList<string> Rooms,
-        [JsonProperty("phones")] IReadOnlyList<string> Phones,
-        [JsonProperty("roles")] IReadOnlyList<string> Roles
+        [property: JsonPropertyName("username")] string Username,
+        [property: JsonPropertyName("personalNumber")] string PersonalNumber,
+        [property: JsonPropertyName("firstName")] string FirstName,
+        [property: JsonPropertyName("lastName")] string LastName,
+        [property: JsonPropertyName("fullName")] string FullName,
+        [property: JsonPropertyName("emails")] IReadOnlyList<string> Emails,
+        [property: JsonPropertyName("preferredEmail")] string PreferredEmail,
+        [property: JsonPropertyName("departments")] IReadOnlyList<UsermapDepartment> Departments,
+        [property: JsonPropertyName("rooms")] IReadOnlyList<string> Rooms,
+        [property: JsonPropertyName("phones")] IReadOnlyList<string> Phones,
+        [property: JsonPropertyName("roles")] IReadOnlyList<string> Roles
     );
 }

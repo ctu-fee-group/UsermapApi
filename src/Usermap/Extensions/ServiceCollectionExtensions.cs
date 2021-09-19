@@ -5,8 +5,15 @@
 //  Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using Usermap.Caching;
 using Usermap.Controllers;
 
@@ -18,59 +25,56 @@ namespace Usermap.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers <see cref="UsermapClientFactory"/> into the collection and adds <see cref="UsermapApiOptions"/>.
-        /// </summary>
-        /// <param name="services">The collection of the services.</param>
-        /// <param name="lifetime">The lifetime for the factory.</param>
-        /// <returns>The passed service collection.</returns>
-        public static IServiceCollection AddUsermapClientFactory
-        (
-            this IServiceCollection services,
-            ServiceLifetime lifetime = ServiceLifetime.Singleton
-        )
-        {
-            services
-                .AddOptions<UsermapApiOptions>();
-
-            services
-                .TryAdd
-                    (ServiceDescriptor.Describe(typeof(UsermapClientFactory), typeof(UsermapClientFactory), lifetime));
-
-            return services;
-        }
-
-        /// <summary>
         /// Registers <see cref="IUsermapPeopleApi"/> into the collection.
         /// </summary>
         /// <remarks>
-        /// UsermapApi uses <see cref="UsermapClientFactory"/>, it has to be registered in the collection.
-        /// If it isn't, it will be registered with the same lifetime as the uesrmap api..
+        /// Usermap api uses <see cref="IHttpClientFactory"/>.
         /// </remarks>
-        /// <param name="services">The collection of the services.</param>
+        /// <param name="serviceCollection">The collection of the services.</param>
         /// <param name="getAccessToken">The function to obtain access token with.</param>
         /// <param name="lifetime">The lifetime for the api.</param>
         /// <returns>The passed service collection.</returns>
         public static IServiceCollection AddUsermapApi
         (
-            this IServiceCollection services,
+            this IServiceCollection serviceCollection,
             Func<IServiceProvider, string> getAccessToken,
             ServiceLifetime lifetime = ServiceLifetime.Singleton
         )
         {
-            services
-                .AddUsermapClientFactory(lifetime);
-
-            services
-                .TryAddScoped<UsermapHttpClient>
+            var clientBuilder = serviceCollection
+                .AddHttpClient
                 (
-                    p =>
-                        p.GetRequiredService<UsermapClientFactory>().CreateClient(getAccessToken(p))
+                    "Usermap",
+                    (services, client) =>
+                    {
+                        var token = getAccessToken(services);
+
+                        client.BaseAddress = new Uri
+                        (
+                            services.GetRequiredService<IOptions<UsermapApiOptions>>().Value.BaseUrl ??
+                            throw new InvalidOperationException("Token not found")
+                        );
+
+                        if (string.IsNullOrWhiteSpace(token))
+                        {
+                            throw new InvalidOperationException("The authentication token has to contain something.");
+                        }
+
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue
+                        (
+                            "Bearer",
+                            token
+                        );
+                    }
                 );
 
-            services
+            serviceCollection
+                .TryAdd(ServiceDescriptor.Describe(typeof(UsermapHttpClient), typeof(UsermapHttpClient), lifetime));
+
+            serviceCollection
                 .TryAddScoped<IUsermapPeopleApi, UsermapPeopleApi>();
 
-            return services;
+            return serviceCollection;
         }
 
         /// <summary>
