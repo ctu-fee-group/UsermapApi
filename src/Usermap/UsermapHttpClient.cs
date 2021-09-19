@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,28 +22,32 @@ namespace Usermap
     /// </summary>
     public class UsermapHttpClient
     {
-        private readonly IHttpClientFactory _clientFactory;
         private readonly ILogger _logger;
         private readonly UsermapApiOptions _options;
         private readonly JsonSerializerOptions _serializerOptions;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly TokenProvider _tokenProvider;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UsermapHttpClient"/> class.
         /// </summary>
-        /// <param name="clientFactory">The http client factory with configured "Usermap" client.</param>
+        /// <param name="tokenProvider">The token provider.</param>
         /// <param name="logger">The logger.</param>
         /// <param name="options">The options.</param>
         /// <param name="serializerOptions">The serializer options.</param>
+        /// <param name="httpClientFactory">The http client factory.</param>
         public UsermapHttpClient
         (
-            IHttpClientFactory clientFactory,
+            TokenProvider tokenProvider,
             ILogger<UsermapHttpClient> logger,
             IOptionsSnapshot<UsermapApiOptions> options,
-            IOptions<JsonSerializerOptions> serializerOptions
+            IOptions<JsonSerializerOptions> serializerOptions,
+            IHttpClientFactory httpClientFactory
         )
         {
+            _tokenProvider = tokenProvider;
+            _httpClientFactory = httpClientFactory;
             _serializerOptions = serializerOptions.Value;
-            _clientFactory = clientFactory;
             _logger = logger;
             _options = options.Value;
         }
@@ -63,9 +68,15 @@ namespace Usermap
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, path);
             configureRequest?.Invoke(requestMessage);
 
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue
+            (
+                "Bearer",
+                _tokenProvider.AccessToken
+            );
+
             try
             {
-                var client = _clientFactory.CreateClient("Usermap");
+                var client = _httpClientFactory.CreateClient("Usermap");
                 using var response = await client.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead, token);
                 return await ParseResponse<TEntity>(response, token);
             }

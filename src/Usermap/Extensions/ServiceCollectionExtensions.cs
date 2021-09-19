@@ -32,47 +32,46 @@ namespace Usermap.Extensions
         /// </remarks>
         /// <param name="serviceCollection">The collection of the services.</param>
         /// <param name="getAccessToken">The function to obtain access token with.</param>
+        /// <param name="configureClient">The action for configuration of http client.</param>
         /// <param name="lifetime">The lifetime for the api.</param>
         /// <returns>The passed service collection.</returns>
         public static IServiceCollection AddUsermapApi
         (
             this IServiceCollection serviceCollection,
             Func<IServiceProvider, string> getAccessToken,
+            Action<IHttpClientBuilder>? configureClient = null,
             ServiceLifetime lifetime = ServiceLifetime.Singleton
         )
         {
+            serviceCollection.TryAdd
+            (
+                ServiceDescriptor.Describe(typeof(TokenProvider), p => new TokenProvider(getAccessToken(p)), lifetime)
+            );
+
             var clientBuilder = serviceCollection
                 .AddHttpClient
                 (
                     "Usermap",
                     (services, client) =>
                     {
-                        var token = getAccessToken(services);
-
                         client.BaseAddress = new Uri
                         (
                             services.GetRequiredService<IOptions<UsermapApiOptions>>().Value.BaseUrl ??
-                            throw new InvalidOperationException("Token not found")
-                        );
-
-                        if (string.IsNullOrWhiteSpace(token))
-                        {
-                            throw new InvalidOperationException("The authentication token has to contain something.");
-                        }
-
-                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue
-                        (
-                            "Bearer",
-                            token
+                            throw new InvalidOperationException("BaseUrl not found")
                         );
                     }
                 );
+            configureClient?.Invoke(clientBuilder);
 
-            serviceCollection
-                .TryAdd(ServiceDescriptor.Describe(typeof(UsermapHttpClient), typeof(UsermapHttpClient), lifetime));
+            serviceCollection.TryAdd
+            (
+                ServiceDescriptor.Describe(typeof(UsermapHttpClient), typeof(UsermapHttpClient), lifetime)
+            );
 
-            serviceCollection
-                .TryAddScoped<IUsermapPeopleApi, UsermapPeopleApi>();
+            serviceCollection.TryAdd
+            (
+                ServiceDescriptor.Describe(typeof(IUsermapPeopleApi), typeof(UsermapPeopleApi), lifetime)
+            );
 
             return serviceCollection;
         }
@@ -95,7 +94,10 @@ namespace Usermap.Extensions
             services
                 .TryAddScoped<UsermapCacheService>();
 
-            services.Configure<UsermapCacheOptions>(configureOptions);
+            if (configureOptions is not null)
+            {
+                services.Configure<UsermapCacheOptions>(configureOptions);
+            }
 
             return services
                 .Replace
