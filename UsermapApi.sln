@@ -1,8 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Usermap", "Usermap\Usermap.csproj", "{15B2AEA8-CB67-404C-AF12-BA4BD8B3889C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Usermap", "src\Usermap\Usermap.csproj", "{15B2AEA8-CB67-404C-AF12-BA4BD8B3889C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Usermap.Example", "Usermap.Example\Usermap.Example.csproj", "{2F98AF88-D5DC-4D1B-93E0-62BCCF26D560}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Usermap.Example", "src\Usermap.Example\Usermap.Example.csproj", "{2F98AF88-D5DC-4D1B-93E0-62BCCF26D560}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".metadata", ".metadata", "{572F0F07-2F80-4A11-9B8D-28297A102806}"
+ProjectSection(SolutionItems) = preProject
+	stylecop.ruleset = stylecop.ruleset
+	stylecop.json = stylecop.json
+	Directory.Build.props = Directory.Build.props
+EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
