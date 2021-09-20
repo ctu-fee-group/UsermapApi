@@ -4,6 +4,7 @@
 //  Copyright (c) Christofel authors. All rights reserved.
 //  Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using Microsoft.Extensions.Options;
 using Usermap.Controllers;
 
@@ -19,6 +20,11 @@ namespace Usermap
         /// True by default.
         /// </summary>
         public bool ThrowOnError { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the timeout of the requests in seconds. Default value is 60.
+        /// </summary>
+        public int Timeout { get; set; } = 60;
 
         /// <summary>
         /// Gets or sets the base url of the API.

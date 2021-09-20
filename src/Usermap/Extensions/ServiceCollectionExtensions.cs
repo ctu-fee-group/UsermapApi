@@ -54,9 +54,11 @@ namespace Usermap.Extensions
                     "Usermap",
                     (services, client) =>
                     {
+                        var options = services.GetRequiredService<IOptions<UsermapApiOptions>>().Value;
+                        client.Timeout = TimeSpan.FromSeconds(options.Timeout);
                         client.BaseAddress = new Uri
                         (
-                            services.GetRequiredService<IOptions<UsermapApiOptions>>().Value.BaseUrl ??
+                            options.BaseUrl ??
                             throw new InvalidOperationException("BaseUrl not found")
                         );
                     }
