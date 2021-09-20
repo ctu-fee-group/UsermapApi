@@ -9,6 +9,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -43,6 +45,8 @@ namespace Usermap.Extensions
             ServiceLifetime lifetime = ServiceLifetime.Singleton
         )
         {
+            serviceCollection.Configure<JsonSerializerOptions>(o => o.Converters.Add(new JsonStringEnumConverter()));
+
             serviceCollection.TryAdd
             (
                 ServiceDescriptor.Describe(typeof(TokenProvider), p => new TokenProvider(getAccessToken(p)), lifetime)

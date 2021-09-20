@@ -4,6 +4,8 @@
 //   Copyright (c) Christofel authors. All rights reserved.
 //   Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Runtime.Serialization;
+
 namespace Usermap.Data
 {
     /// <summary>
@@ -14,11 +16,13 @@ namespace Usermap.Data
         /// <summary>
         /// The business role.
         /// </summary>
+        [EnumMember(Value = "BUSINESS")]
         Business,
 
         /// <summary>
         /// The technical role.
         /// </summary>
-        Technical
+        [EnumMember(Value = "TECHNICAL")]
+        Technical,
     }
 }
