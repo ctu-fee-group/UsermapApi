@@ -11,14 +11,14 @@ namespace Usermap.Data
     /// <summary>
     /// Represents Usermap Role entity.
     /// </summary>
-    /// <param name="Code">The code of the department.</param>
+    /// <param name="Code">The code of the role.</param>
     /// <param name="DescriptionCzech">The description of the role in czech language.</param>
     /// <param name="DescriptionEnglish">The description of the role in english.</param>
     /// <param name="OrganizationUnit">The number of the organization unit.</param>
     /// <param name="Type">The type of the role.</param>
     public record UsermapRole
     (
-        [property: JsonPropertyName("code")] uint Code,
+        [property: JsonPropertyName("code")] string Code,
         [property: JsonPropertyName("descriptionCs")]
         string DescriptionCzech,
         [property: JsonPropertyName("descriptionEn")]
