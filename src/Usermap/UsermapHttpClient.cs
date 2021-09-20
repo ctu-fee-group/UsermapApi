@@ -132,7 +132,8 @@ namespace Usermap
 
             if (response.IsSuccessStatusCode)
             {
-                return Image.FromStream(await response.Content.ReadAsStreamAsync(token));
+                await using var stream = await response.Content.ReadAsStreamAsync(token);
+                return Image.FromStream(stream);
             }
 
             await HandleErrorResponse(response, token);
@@ -179,7 +180,7 @@ namespace Usermap
         {
             try
             {
-                using var content = await response.Content.ReadAsStreamAsync(token);
+                await using var content = await response.Content.ReadAsStreamAsync(token);
                 var reader = new StreamReader(content);
                 var contentString = await reader.ReadToEndAsync();
 
@@ -216,9 +217,10 @@ namespace Usermap
         {
             if (response.IsSuccessStatusCode)
             {
+                await using var stream = await response.Content.ReadAsStreamAsync(token);
                 var entity = await JsonSerializer.DeserializeAsync<TEntity>
                 (
-                    await response.Content.ReadAsStreamAsync(token),
+                    stream,
                     _serializerOptions,
                     token
                 );
