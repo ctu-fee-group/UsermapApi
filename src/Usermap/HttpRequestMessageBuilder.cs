@@ -19,6 +19,7 @@ namespace Usermap
         private readonly NameValueCollection _query;
         private string _path;
         private HttpMethod _method;
+        private string? _acceptContent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestMessageBuilder"/> class.
@@ -67,6 +68,17 @@ namespace Usermap
         }
 
         /// <summary>
+        /// Sets the Accept header to the specified value.
+        /// </summary>
+        /// <param name="accept">The content-type that should be accepted.</param>
+        /// <returns>The builder.</returns>
+        public HttpRequestMessageBuilder WithContentAccept(string accept)
+        {
+            _acceptContent = accept;
+            return this;
+        }
+
+        /// <summary>
         /// Builds the request message.
         /// </summary>
         /// <returns>The built message.</returns>
@@ -78,7 +90,13 @@ namespace Usermap
                 urlPath += "?" + _query;
             }
 
-            return new HttpRequestMessage(_method, urlPath);
+            var message = new HttpRequestMessage(_method, urlPath);
+            if (_acceptContent is not null)
+            {
+                message.Headers.Add("Accept", _acceptContent);
+            }
+
+            return message;
         }
     }
 }
