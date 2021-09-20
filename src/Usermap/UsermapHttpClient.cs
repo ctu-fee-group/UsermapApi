@@ -113,7 +113,16 @@ namespace Usermap
         public async Task<Image?> GetImageAsync
             (string path, Action<HttpRequestMessageBuilder>? configureRequest = null, CancellationToken token = default)
         {
-            using var requestMessage = ConfigureRequest(path, HttpMethod.Get, configureRequest);
+            using var requestMessage = ConfigureRequest
+            (
+                path,
+                HttpMethod.Get,
+                (builder) =>
+                {
+                    builder.WithContentAccept("image/png");
+                    configureRequest?.Invoke(builder);
+                }
+            );
             using var response = await ExecuteRequestAsync(requestMessage, token);
 
             if (response is null)
@@ -130,7 +139,8 @@ namespace Usermap
             return null;
         }
 
-        private async Task<HttpResponseMessage?> ExecuteRequestAsync(HttpRequestMessage request, CancellationToken token)
+        private async Task<HttpResponseMessage?> ExecuteRequestAsync
+            (HttpRequestMessage request, CancellationToken token)
         {
             try
             {
@@ -149,7 +159,8 @@ namespace Usermap
             }
         }
 
-        private HttpRequestMessage ConfigureRequest(string path, HttpMethod method, Action<HttpRequestMessageBuilder>? configureAction)
+        private HttpRequestMessage ConfigureRequest
+            (string path, HttpMethod method, Action<HttpRequestMessageBuilder>? configureAction)
         {
             var requestMessageBuilder = new HttpRequestMessageBuilder(method, path);
             configureAction?.Invoke(requestMessageBuilder);
@@ -177,7 +188,8 @@ namespace Usermap
                     return;
                 }
 
-                string errorMessage = $"There was an error with calling usermap api: {response.StatusCode} {response.ReasonPhrase} {contentString}";
+                string errorMessage =
+                    $"There was an error with calling usermap api: {response.StatusCode} {response.ReasonPhrase} {contentString}";
                 if (_options.ThrowOnError)
                 {
                     throw new Exception(errorMessage);
@@ -192,7 +204,11 @@ namespace Usermap
                     throw;
                 }
 
-                _logger.LogError(e, $"There was an error while processing the http response {response.StatusCode} {response.ReasonPhrase}");
+                _logger.LogError
+                (
+                    e,
+                    $"There was an error while processing the http response {response.StatusCode} {response.ReasonPhrase}"
+                );
             }
         }
 

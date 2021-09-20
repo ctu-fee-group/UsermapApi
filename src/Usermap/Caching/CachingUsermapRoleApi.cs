@@ -27,7 +27,7 @@ namespace Usermap.Caching
         /// <param name="client">The http client.</param>
         /// <param name="logger">The logger.</param>
         public CachingUsermapRoleApi
-            (UsermapCacheService cacheService, UsermapHttpClient client, ILogger<UsermapRoleApi> logger)
+            (UsermapCacheService cacheService, UsermapHttpClient client, ILogger<CachingUsermapRoleApi> logger)
             : base(client, logger)
         {
             _cacheService = cacheService;
@@ -49,7 +49,7 @@ namespace Usermap.Caching
         public override async Task<IReadOnlyList<string>> GetRoleMembersAsync
             (string code, CancellationToken token = default)
         {
-            var identifier = $"role/{code}/members";
+            var identifier = $"roles/{code}/members";
             if (_cacheService.TryGetValue<IReadOnlyList<string>>(identifier, out var cachedMemberUsernames))
             {
                 return cachedMemberUsernames ?? new List<string>();
@@ -62,7 +62,7 @@ namespace Usermap.Caching
         public override async Task<IReadOnlyList<UsermapRole>> GetRolesAsync
             (uint limit = 10, uint offset = 0, CancellationToken token = default)
         {
-            var identifier = $"people/all/{limit.ToString()}/{offset.ToString()}";
+            var identifier = $"roles/all/{limit.ToString()}/{offset.ToString()}";
             if (_cacheService.TryGetValue<IReadOnlyList<UsermapRole>>(identifier, out var cachedRoles))
             {
                 return cachedRoles ?? new List<UsermapRole>();
@@ -71,7 +71,7 @@ namespace Usermap.Caching
             var roles = await base.GetRolesAsync(limit, offset, token);
             foreach (var role in roles)
             {
-                _cacheService.Cache($"roles/{role.Code.ToString()}", role);
+                _cacheService.Cache($"roles/{role.Code}", role);
             }
 
             return _cacheService.Cache(identifier, roles) ?? new List<UsermapRole>();
