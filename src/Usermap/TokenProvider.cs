@@ -23,6 +23,6 @@ namespace Usermap
         /// <summary>
         /// Gets the access token.
         /// </summary>
-        public string AccessToken { get; set; }
+        public string AccessToken { get; }
     }
 }
