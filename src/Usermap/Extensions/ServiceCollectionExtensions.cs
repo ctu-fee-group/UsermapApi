@@ -66,14 +66,13 @@ namespace Usermap.Extensions
             configureClient?.Invoke(clientBuilder);
 
             serviceCollection.TryAdd
-            (
-                ServiceDescriptor.Describe(typeof(UsermapHttpClient), typeof(UsermapHttpClient), lifetime)
-            );
+                (ServiceDescriptor.Describe(typeof(UsermapHttpClient), typeof(UsermapHttpClient), lifetime));
 
             serviceCollection.TryAdd
-            (
-                ServiceDescriptor.Describe(typeof(IUsermapPeopleApi), typeof(UsermapPeopleApi), lifetime)
-            );
+                (ServiceDescriptor.Describe(typeof(IUsermapPeopleApi), typeof(UsermapPeopleApi), lifetime));
+
+            serviceCollection.TryAdd
+                (ServiceDescriptor.Describe(typeof(IUsermapRoleApi), typeof(UsermapRoleApi), lifetime));
 
             return serviceCollection;
         }
@@ -108,6 +107,15 @@ namespace Usermap.Extensions
                     (
                         typeof(IUsermapPeopleApi),
                         typeof(CachingUsermapPeopleApi),
+                        lifetime
+                    )
+                )
+                .Replace
+                (
+                    ServiceDescriptor.Describe
+                    (
+                        typeof(IUsermapRoleApi),
+                        typeof(CachingUsermapRoleApi),
                         lifetime
                     )
                 );
