@@ -35,6 +35,6 @@ namespace Usermap
         public UsermapApiOptions Value => this;
 
         /// <inheritdoc />
-        public UsermapApiOptions Get(string name) => throw new System.NotImplementedException();
+        public UsermapApiOptions Get(string? name) => throw new System.NotImplementedException();
     }
 }
